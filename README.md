@@ -9,3 +9,4 @@ A description of cocoapods-dependency.
 ## Usage
 
     $ pod spec dependency POD_NAME
+# cocoapods-dependency
