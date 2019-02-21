@@ -1,44 +1,137 @@
 module Pod
   class Command
-    # This is an example of a cocoapods plugin adding a top-level subcommand
-    # to the 'pod' command.
-    #
-    # You can also create subcommands of existing or new commands. Say you
-    # wanted to add a subcommand to `list` to show newly deprecated pods,
-    # (e.g. `pod list deprecated`), there are a few things that would need
-    # to change.
-    #
-    # - move this file to `lib/pod/command/list/deprecated.rb` and update
-    #   the class to exist in the the Pod::Command::List namespace
-    # - change this class to extend from `List` instead of `Command`. This
-    #   tells the plugin system that it is a subcommand of `list`.
-    # - edit `lib/cocoapods_plugins.rb` to require this file
-    #
-    # @todo Create a PR to add your plugin to CocoaPods/cocoapods.org
-    #       in the `plugins.json` file, once your plugin is released.
-    #
     class Dependency < Command
-      self.summary = 'Short description of cocoapods-dependency.'
+      include Command::ProjectDirectory
+
+      self.summary = 'Help you know your project dependecncies with HTML file.'
 
       self.description = <<-DESC
-        Longer description of cocoapods-dependency.
+        Shows the project's dependency.
       DESC
 
-      self.arguments = 'NAME'
+      def self.arguments
+        [
+          CLAide::Argument.new('NAME', false)
+        ].concat(super)
+      end
 
       def initialize(argv)
         @name = argv.shift_argument
+        @dependency_names = Array.new
+        @dependencies_hash = Hash.new
         super
       end
 
       def validate!
         super
-        help! 'A Pod name is required.' unless @name
+        puts @name
       end
 
       def run
-        UI.puts "Add your implementation for the cocoapods-dependency plugin in #{__FILE__}"
+        require 'yaml'
+        UI.title "Calculating dependencies" do
+          dependencies ## hash
+        end
+
+        UI.title 'Dependencies' do
+          dependencies.map { |dep|
+            if dep.is_a? Hash
+              dep_hash = dep.to_h
+              key = remove_version(dep_hash.keys.first)
+              if !is_subspec(key)
+                @dependencies_hash.store(key, dep_hash[dep_hash.keys.first])
+                @dependency_names << key
+              end
+
+            else
+              if !is_subspec(dep)
+                @dependencies_hash.store(remove_version(dep), dep)
+                @dependency_names << remove_version(dep)
+              end
+            end
+          }
+
+          if @name
+            UI.title "#{@name} Dependencies" do
+              puts @dependencies_hash["#{@name}"]
+            end
+          end
+
+          module_arr = Array.new
+          kss_arr = Array.new
+          second_party = Array.new
+          third_party = Array.new
+
+          @dependency_names.map { |dep|
+            if dep =~ /^LPD.*?Module/
+              module_arr << dep
+            elsif dep =~ /^LPD/ && dep =~ /Kit|SDK|Service/
+              kss_arr << dep
+            elsif dep =~ /\||^ELM|^APF|^LPD/
+              second_party << dep
+            else
+              third_party << dep
+            end
+          }
+
+          UI.title 'First Level Dependencies' do
+              puts module_arr
+          end
+
+          UI.title 'Second Level Dependencies' do
+              puts kss_arr
+          end
+
+          UI.title 'Third Level Dependencies' do
+              puts second_party
+          end
+
+          UI.title 'Other Level Dependencies' do
+              puts third_party
+          end
+        end
       end
+
+      def remove_version pod_name
+          if pod_name.include? " "
+            return pod_name.split(" ").first
+          end
+          pod_name
+      end
+
+      def get_pod_dependency pod_name
+        return @dependencies_hash[pod_name]
+      end
+
+      def is_subspec pod_name
+          if pod_name.include? "/"
+            return true
+          end
+  	      return false
+      end
+
+      def dependencies
+        @dependencies ||= begin
+          lockfile = config.lockfile unless @ignore_lockfile || @podspec
+
+          if !lockfile || @repo_update
+            analyzer = Installer::Analyzer.new(
+              sandbox,
+              podfile,
+              lockfile
+            )
+
+            specs = config.with_changes(skip_repo_update: !@repo_update) do
+              analyzer.analyze(@repo_update || @podspec).specs_by_target.values.flatten(1)
+            end
+
+            lockfile = Lockfile.generate(podfile, specs, {})
+          end
+
+          lockfile.to_hash['PODS']
+        end
+      end
+
     end
   end
 end
