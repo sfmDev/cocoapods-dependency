@@ -29,6 +29,10 @@ module Pod
 
       def run
         require 'yaml'
+        require 'launchy'
+
+        Launchy.open( "/Users/SFM/workspace/cocoapods-dependency/lib/cocoapods-dependency/front-end/dependency_graph.html")
+
         UI.title "Calculating dependencies" do
           dependencies ## hash
         end
