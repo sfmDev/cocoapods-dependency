@@ -1,40 +1,90 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>ECharts</title>
-    <!-- 引入 echarts.js -->
-    <script type="text/javascript" src="JS/echarts.js"></script>
-</head>
-<body>
-    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <div id="main" style="width: 99%; height:98%; position: absolute; margin: 0; padding: 0;"></div>
-    <script type="text/javascript">
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="width: 99%; height:98%; position: absolute; margin: 0; padding: 0;"></div>
+       <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+       <script type="text/javascript">
+          var dom = document.getElementById("container");
+          var myChart = echarts.init(dom);
+          var app = {};
+          option = null;
+          myChart.showLoading();
 
-        // 指定图表的配置项和数据
-        var option = {
-            title: {
-                text: 'ECharts 入门示例'
-            },
-            tooltip: {},
-            legend: {
-                data:['销量']
-            },
-            xAxis: {
-                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-            },
-            yAxis: {},
-            series: [{
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
-        };
-
-        // 使用刚指定的配置项和数据显示图表。
-        myChart.setOption(option);
-    </script>
-</body>
+          function index(json){
+            myChart.hideLoading();
+            myChart.setOption(option = {
+                title: {
+                    text: 'LPD Dependencies'
+                },
+                animationDurationUpdate: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                series : [
+                    {
+                        type: 'graph',
+                        layout: 'none',
+                        //progressiveThreshold: 700,
+                        hoverAnimation: false,
+                        data: json.nodes.map(function (node) {
+                            return {
+                                x: node.x,
+                                y: node.y,
+                                id: node.id,
+                                name: node.label,
+                                symbolSize: node.size,
+                                itemStyle: {
+                                    normal: {
+                                        color: node.color
+                                    }
+                                }
+                            };
+                        }),
+                        edges: json.edges.map(function (edge) {
+                            return {
+                                source: edge.sourceID,
+                                target: edge.targetID
+                            };
+                        }),
+                        label: {
+                            emphasis: {
+                                position: 'bottom',
+                                show: true,
+                                formatter: '{b}',
+                                distance: 5
+                            }
+                        },
+                        roam: true,
+                        focusNodeAdjacency: true,
+                        symbol: 'roundRect',
+                        lineStyle: {
+                            normal: {
+                                width: 0.3,
+                                curveness: 0,
+                                opacity: 0.7,
+                                color: 'source',
+                            }
+                        },
+                        itemStyle: {
+                          normal: {
+                            borderColor: '#fff',
+                            borderWidth: 1,
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.3)'
+                          }
+                        },
+                        emphasis: {
+                            lineStyle: {
+                              width: 3
+                            }
+                        }
+                    }
+                ]
+            }, true);
+            myChart.setOption(option);
+          }
+       </script>
+       <script type="text/javascript" src="/Users/SFM/workspace/ali-ele/LPDTeamiOS/pod_dependency.json?cb=index"></script>
+   </body>
 </html>
