@@ -212,9 +212,9 @@ module Pod
           node["attributes"] = {}
           node["y"] = -2000 + level * 2000
           if is_left
-            node["x"] = 0 + (index + 1) * 100
+            node["x"] = 0 + (index + 1) * 150
           else
-            node["x"] = 0 - index * 100
+            node["x"] = 0 - index * 150
           end
 
           node["id"] = pod_name
