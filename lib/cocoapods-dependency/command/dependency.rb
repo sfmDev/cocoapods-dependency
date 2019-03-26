@@ -75,7 +75,7 @@ module Pod
             end
           }
 
-          root_sourceId = "LPDTeamiOS"
+          root_sourceId = get_project_name
           add_root(root_sourceId, module_arr.count)
 
           UI.title 'Other Level Dependencies' do
@@ -132,14 +132,16 @@ module Pod
 
             require 'yaml'
             require 'launchy'
-
-            p `pwd`
-
-            # Launchy.open("/Users/SFM/workspace/cocoapods-dependency/lib/cocoapods-dependency/front-end/dependency_graph.html")
+            p `wget https://raw.githubusercontent.com/sfmDev/cocoapods-dependency/master/lib/cocoapods-dependency/front-end/dependency_graph.html`
+            Launchy.open("./dependency_graph.html")
           end
         end
       end
 
+      def get_project_name
+        path = `pwd`
+        return path.split("/").last
+      end
 
       def get_pod_size pod_name
         if  @dependencies_hash["#{pod_name}"].class == Array
