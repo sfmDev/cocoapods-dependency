@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'cocoapods-dependency'
   spec.version       = CocoapodsDependency::VERSION
   spec.authors       = ['fengming.shi']
-  spec.email         = ['fengming.shi@ele.me']
+  spec.email         = ['sfmdeveloper@icloud.com']
   spec.description   = %q{A short description of cocoapods-dependency.}
   spec.summary       = %q{A longer description of cocoapods-dependency.}
   spec.homepage      = 'https://github.com/EXAMPLE/cocoapods-dependency'

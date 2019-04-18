@@ -27,8 +27,6 @@ module Pod
         @use_tree = argv.flag?('use-tree', false)
         @dependencies_regular_hash = Hash.new
 
-        read_config
-
         @dependency_names = Array.new
         @dependencies_hash = Hash.new
         @dependencies_tree_levels = Array.new
@@ -50,17 +48,23 @@ module Pod
         if File::exist?("./dependency_config")
           file = File.open("./dependency_config", 'r')
           @dependencies_regular_hash = JSON.load(file.read())
+          return true
           if !@dependencies_regular_hash
             puts "dependency_config file cannot be converted to JSONObject"
-            return
+            return false
           end
         else
           puts "Please add json file named dependency_config in project root path"
-          return
+          return false
         end
       end
 
       def run
+        is_success = read_config
+        if !is_success
+          return
+        end
+
         UI.title "Calculating dependencies" do
           dependencies
         end
@@ -148,39 +152,6 @@ module Pod
                  end
               end
             end
-
-            # UI.title 'First Level Dependencies' do
-            #     puts module_arr
-            #     for i in 0..module_arr.count-1
-            #       pod_name = module_arr[i]
-            #       add_node(module_arr[i], get_pod_size(pod_name), i, 1, i % 2 == 0)
-            #       add_edge(root_sourceId, remove_version(module_arr[i]))
-            #     end
-            # end
-            #
-            # UI.title 'Second Level Dependencies' do
-            #     puts kss_arr
-            #     for i in 0..kss_arr.count-1
-            #       pod_name = kss_arr[i]
-            #       add_node(kss_arr[i], get_pod_size(pod_name), i, 2, i % 2 == 0)
-            #     end
-            # end
-            #
-            # UI.title 'Third Level Dependencies' do
-            #     puts second_party
-            #     for i in 0..second_party.count-1
-            #       pod_name = second_party[i]
-            #       add_node(second_party[i], get_pod_size(pod_name), i, 3, i % 2 == 0)
-            #     end
-            # end
-            #
-            # UI.title 'Other Level Dependencies' do
-            #     puts third_party
-            #     for i in 0..third_party.count-1
-            #       pod_name = third_party[i]
-            #       add_node(pod_name, get_pod_size(pod_name), i, 4, i % 2 == 0)
-            #     end
-            # end
           end
 
           @dependencies_hash.each { |key,value|
@@ -283,7 +254,7 @@ module Pod
         if @use_tree
           return 15
         else
-          if  @dependencies_hash["#{pod_name}"].class == Array
+          if @dependencies_hash["#{pod_name}"].class == Array
             return 10
           else
             return 10
