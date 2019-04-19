@@ -6,7 +6,7 @@ require 'cocoapods-dependency/gem_version.rb'
 Gem::Specification.new do |spec|
   spec.name          = 'cocoapods-dependency'
   spec.version       = CocoapodsDependency::VERSION
-  spec.authors       = ['sfmDev']
+  spec.authors       = ['sfmdev']
   spec.email         = ['sfmdeveloper@icloud.com']
   spec.description   = %q{Show project dependencies with HTML file.}
   spec.summary       = %q{Show project dependencies with HTML file.}
