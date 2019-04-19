@@ -31,4 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
 
   spec.add_dependency "launchy"
+  spec.add_dependency 'cocoapods', '~> 1.0'
+  spec.add_dependency 'json', '~> 1.8'
 end
