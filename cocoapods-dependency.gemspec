@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = CocoapodsDependency::VERSION
   spec.authors       = ['sfmDev']
   spec.email         = ['sfmdeveloper@icloud.com']
-  spec.description   = %q{A short description of cocoapods-dependency.}
-  spec.summary       = %q{A longer description of cocoapods-dependency.}
+  spec.description   = %q{Show project dependencies with HTML file.}
+  spec.summary       = %q{Show project dependencies with HTML file.}
   spec.homepage      = 'https://github.com/sfmDev/cocoapods-dependency'
   spec.license       = 'MIT'
 
